@@ -3,92 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise HR, Accounting & Multi-Tenant Platform</title>
+    <title>ROCEL-HUBEL - Multi-Tenant Workspace & Enterprise Management</title>
+    <!-- Tailwind CSS for modern responsive layout -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for financial analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar styling for slick dark mode dashboard */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col overflow-hidden">
 
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 font-medium text-sm">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        <span id="toast-message">Action completed successfully</span>
+    <!-- Global Notification Toast -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-slate-100 border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-medium">
+        <i data-lucide="info" id="toast-icon" class="w-5 h-5 text-indigo-400"></i>
+        <span id="toast-message">Action processed</span>
     </div>
 
-    <!-- MAIN WRAPPER -->
+    <!-- MAIN APP WRAPPER -->
     <div class="flex h-screen overflow-hidden">
 
         <!-- SIDEBAR NAVIGATION -->
         <aside class="w-72 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
             <div>
                 <!-- Brand Header -->
-                <div class="p-6 border-b border-slate-800/80 flex items-center justify-between">
+                <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-indigo-500/20">
-                            A
+                            RH
                         </div>
                         <div>
                             <h1 class="font-bold text-slate-100 tracking-wide text-base leading-none">ROCEL-HUBEL</h1>
-                            <span class="text-[11px] text-slate-400 font-medium">Enterprise Control Hub</span>
+                            <span class="text-[11px] text-slate-400 font-medium">Multi-Tenant Platform</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Current Role Banner -->
-                <div class="p-4 mx-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Active View Role</span>
-                        <div id="current-role-badge" class="text-xs font-bold text-indigo-400 mt-0.5">Super Admin</div>
+                <!-- Active Mode & Context Selector -->
+                <div class="p-4 mx-3 mt-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Active Workspace Scope</span>
+                        <span id="scope-mode-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                            Super Admin
+                        </span>
                     </div>
-                    <button onclick="showToast('Super Admin Role active')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition" title="System Authority">
-                        <i data-lucide="shield" class="w-4 h-4"></i>
-                    </button>
+
+                    <!-- Dynamic Tenant Switcher Dropdown -->
+                    <div>
+                        <select id="sidebar-tenant-select" onchange="handleTenantSelectChange(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-indigo-500 transition">
+                            <option value="super-admin">🌐 All Tenants (Super Admin View)</option>
+                            <optgroup label="Tenant Workspaces" id="tenant-optgroup">
+                                <!-- Dynamic Options -->
+                            </optgroup>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Navigation Links -->
-                <nav class="p-4 space-y-1">
-                    <div class="px-3 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">Super Admin Domain</div>
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-indigo-400 bg-indigo-500/10 border border-indigo-500/20">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview & Metrics
+                <!-- NAVIGATION NAVIGATION LINKS -->
+                <nav class="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
+                    
+                    <!-- SUPER ADMIN SECTION -->
+                    <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Global Administration</div>
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-indigo-400 bg-indigo-500/10 border border-indigo-500/20">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Global Analytics
                     </button>
-                    <button onclick="switchTab('companies')" id="nav-companies" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                    <button onclick="switchTab('companies')" id="nav-companies" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
                         <i data-lucide="building-2" class="w-4 h-4"></i> Company Tenants
                     </button>
-                    <button onclick="switchTab('email-dispatch')" id="nav-email-dispatch" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                        <i data-lucide="mail" class="w-4 h-4"></i> Email Dispatch & Links
-                        <span class="ml-auto text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full font-bold">New</span>
+                    <button onclick="switchTab('email-dispatch')" id="nav-email-dispatch" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="mail" class="w-4 h-4"></i> Onboarding & Invites
                     </button>
-                    <button onclick="switchTab('payouts')" id="nav-payouts" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                        <i data-lucide="landmark" class="w-4 h-4"></i> Bank & Direct Payouts
-                    </button>
-                    <button onclick="switchTab('payment')" id="nav-payment" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                        <i data-lucide="credit-card" class="w-4 h-4"></i> Payment Platform
+                    <button onclick="switchTab('payouts')" id="nav-payouts" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="landmark" class="w-4 h-4"></i> Bank & Payouts
                     </button>
 
-                    <div id="company-scoped-nav" class="space-y-1 pt-2">
-                        <div class="px-3 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">Tenant Portal Access</div>
-                        <button onclick="switchTab('exec-leaders')" id="nav-exec-leaders" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                            <i data-lucide="user-check" class="w-4 h-4"></i> Leaders & Dept Heads
-                        </button>
-                        <button onclick="switchTab('hr')" id="nav-hr" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                            <i data-lucide="users" class="w-4 h-4"></i> HR Operations
-                        </button>
-                        <button onclick="switchTab('accounting')" id="nav-accounting" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
-                            <i data-lucide="receipt" class="w-4 h-4"></i> General Ledger & AP/AR
-                        </button>
+                    <!-- TENANT WORKSPACE SECTION -->
+                    <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                        <span>Tenant Workspace</span>
+                        <span id="nav-tenant-label" class="text-indigo-400 font-normal lowercase truncate max-w-[90px]"></span>
                     </div>
+                    <button onclick="switchTab('workspace-overview')" id="nav-workspace-overview" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="layout" class="w-4 h-4"></i> Workspace Overview
+                    </button>
+                    <button onclick="switchTab('tenant-hr')" id="nav-tenant-hr" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="users" class="w-4 h-4"></i> Staff & HR Directory
+                    </button>
+                    <button onclick="switchTab('tenant-finance')" id="nav-tenant-finance" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="receipt" class="w-4 h-4"></i> Financial Ledger & AR/AP
+                    </button>
+                    <button onclick="switchTab('tenant-heads')" id="nav-tenant-heads" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition text-slate-400 hover:bg-slate-900 hover:text-slate-200">
+                        <i data-lucide="user-check" class="w-4 h-4"></i> Dept Heads & Access
+                    </button>
                 </nav>
             </div>
 
             <!-- Profile Footer -->
-            <div class="p-4 border-t border-slate-800/80 bg-slate-950/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm">
-                        RH
+            <div class="p-4 border-t border-slate-800/80 bg-slate-950/50 flex items-center justify-between">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs">
+                        SA
                     </div>
                     <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-slate-200 truncate">ROCEL-HUBEL Admin</div>
-                        <div class="text-[11px] text-slate-400 truncate">owner@rocel-hubel.github.io</div>
+                        <div class="text-xs font-bold text-slate-200 truncate">Super Admin Owner</div>
+                        <div class="text-[10px] text-slate-400 truncate">rocel-hubel.github.io</div>
                     </div>
                 </div>
             </div>
@@ -98,95 +121,86 @@
         <main class="flex-1 bg-slate-900 overflow-y-auto flex flex-col">
             
             <!-- TOP BAR -->
-            <header class="h-16 border-b border-slate-800 bg-slate-950/40 px-8 flex items-center justify-between shrink-0 sticky top-0 z-10 backdrop-blur-md">
+            <header class="h-16 border-b border-slate-800 bg-slate-950/60 px-8 flex items-center justify-between shrink-0 sticky top-0 z-20 backdrop-blur-md">
                 <div class="flex items-center gap-3">
-                    <h2 id="page-title" class="text-lg font-bold text-slate-100">Overview & System Analytics</h2>
-                    <span id="tenant-privacy-tag" class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        GitHub Hosted Workspace
-                    </span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <span class="text-[11px] text-slate-400 block font-medium">Gateway Settlement Target</span>
-                        <span class="text-xs font-bold text-slate-200">JPMorgan Chase (****8821)</span>
+                    <h2 id="page-title" class="text-base font-bold text-slate-100">Global Overview</h2>
+                    
+                    <!-- Dynamic URL Indicator Pill -->
+                    <div id="url-sim-pill" class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-slate-400 font-mono text-[11px]" id="current-url-display">https://rocel-hubel.github.io/</span>
                     </div>
-                    <div class="h-8 w-[1px] bg-slate-800"></div>
-                    <button onclick="showToast('Platform metrics re-synchronized')" class="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/60 hover:bg-slate-800 rounded-xl transition">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="copyCurrentWorkspaceURL()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl flex items-center gap-2 border border-slate-700 transition">
+                        <i data-lucide="share-2" class="w-3.5 h-3.5 text-indigo-400"></i> Copy Direct Share Link
                     </button>
+                    <div class="h-6 w-[1px] bg-slate-800"></div>
+                    <span id="active-tenant-indicator-badge" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                        Global View
+                    </span>
                 </div>
             </header>
 
             <!-- VIEW PANELS CONTAINER -->
-            <div class="p-8 space-y-8 flex-1">
+            <div class="p-8 space-y-6 flex-1">
 
-                <!-- TAB 1: OVERVIEW DASHBOARD -->
+                <!-- TAB 1: GLOBAL DASHBOARD -->
                 <div id="view-dashboard" class="tab-panel space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Monthly Recurring (MRR)</span>
-                            <div class="text-2xl font-bold text-slate-100 mt-2">$24,800.00</div>
-                            <span class="text-xs font-semibold text-emerald-400 mt-1 inline-flex items-center gap-1">
-                                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +14.2% from last month
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Platform MRR</span>
+                            <div class="text-2xl font-bold text-slate-100 mt-1">$24,800.00</div>
+                            <span class="text-[11px] text-emerald-400 font-semibold inline-flex items-center gap-1 mt-1">
+                                <i data-lucide="trending-up" class="w-3 h-3"></i> Across 3 Active Tenants
                             </span>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cleared Bank Payouts</span>
-                            <div class="text-2xl font-bold text-emerald-400 mt-2">$18,400.00</div>
-                            <span class="text-xs font-semibold text-slate-400 mt-1 inline-block">Direct Chase Settlement</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Employees Managed</span>
+                            <div class="text-2xl font-bold text-slate-100 mt-1" id="global-employee-count">142</div>
+                            <span class="text-[11px] text-indigo-400 font-semibold mt-1 block">Isolated per Workspace</span>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Tenant Companies</span>
-                            <div class="text-2xl font-bold text-slate-100 mt-2">18 Companies</div>
-                            <span class="text-xs font-semibold text-indigo-400 mt-1 inline-block">100% System Access Rights</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bank Direct Payouts</span>
+                            <div class="text-2xl font-bold text-emerald-400 mt-1">$18,400.00</div>
+                            <span class="text-[11px] text-slate-400 mt-1 block">Chase Bank • Ref: 8821</span>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Head Approvals</span>
-                            <div class="text-2xl font-bold text-amber-400 mt-2">3 Requests</div>
-                            <span class="text-xs font-semibold text-amber-400/80 mt-1 inline-block">Action Needed</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Tenant Invites</span>
+                            <div class="text-2xl font-bold text-amber-400 mt-1">1 Pending</div>
+                            <span class="text-[11px] text-amber-400/80 mt-1 block">Vanguard Financials</span>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 bg-slate-950/60 border border-slate-800 p-6 rounded-2xl">
-                            <h3 class="text-base font-bold text-slate-200 mb-4">Subscription Revenue & Payout Cashflow</h3>
-                            <canvas id="mrrChart" class="max-h-64"></canvas>
+                            <h3 class="text-sm font-bold text-slate-200 mb-4">Platform Revenue Cashflow</h3>
+                            <canvas id="mrrChart" class="max-h-60"></canvas>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
                             <div>
-                                <h3 class="text-base font-bold text-slate-200 mb-2">Platform Access Scope</h3>
-                                <p class="text-xs text-slate-400 leading-relaxed">As the Super Admin of ROCEL-HUBEL, your account governs subscription tiers, company tenant usage rights, bank deposit routing, and approving Department Head accounts.</p>
+                                <h3 class="text-sm font-bold text-slate-200 mb-2">Workspace Isolation Engine</h3>
+                                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                                    ROCEL-HUBEL hosts multiple independent company environments under single-file execution. Click any tenant below to switch directly to their isolated workspace context:
+                                </p>
                             </div>
-                            <div class="space-y-3 my-4">
-                                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <span class="text-xs font-medium text-slate-300">GitHub Host Target</span>
-                                    <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">ROCEL-HUBEL</span>
-                                </div>
-                                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <span class="text-xs font-medium text-slate-300">Financial Ledger Data</span>
-                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Tenant Isolated</span>
-                                </div>
-                                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <span class="text-xs font-medium text-slate-300">Staff Appointment Rights</span>
-                                    <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">Dept Head Scope</span>
-                                </div>
+                            <div id="quick-tenant-list" class="space-y-2">
+                                <!-- Dynamic Render -->
                             </div>
-                            <button onclick="switchTab('email-dispatch')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl transition">
-                                Dispatch Company Onboarding Links
-                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 2: COMPANY TENANTS & INVITE LINKS -->
+                <!-- TAB 2: COMPANY TENANTS & LINKS -->
                 <div id="view-companies" class="tab-panel hidden space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">Tenant Companies & Access Control</h3>
-                            <p class="text-xs text-slate-400">Manage tenant usage rights, copy unique invite links, and assign initial company departments.</p>
+                            <h3 class="text-lg font-bold text-slate-100">Company Tenants & Dynamic Workspaces</h3>
+                            <p class="text-xs text-slate-400">Click on any tenant name or workspace link to load its isolated data directly without page reloads.</p>
                         </div>
                         <button onclick="openAddCompanyModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Add New Company Tenant
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add New Tenant Company
                         </button>
                     </div>
 
@@ -194,107 +208,84 @@
                         <table class="w-full text-left text-xs text-slate-300">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase font-bold border-b border-slate-800">
                                 <tr>
-                                    <th class="p-4">Company Name</th>
-                                    <th class="p-4">Dedicated GitHub Invite Link</th>
+                                    <th class="p-4">Tenant Company</th>
+                                    <th class="p-4">Direct GitHub Workspace URL</th>
                                     <th class="p-4">Subscription Plan</th>
-                                    <th class="p-4">Departments Pre-Created</th>
-                                    <th class="p-4">Payment Status</th>
+                                    <th class="p-4">Departments</th>
+                                    <th class="p-4">Status</th>
                                     <th class="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="company-table-body" class="divide-y divide-slate-800/60">
-                                <!-- Dynamic Render -->
+                                <!-- Dynamic Companies Render -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- TAB 3: EMAIL DISPATCH & ONBOARDING HUB -->
+                <!-- TAB 3: EMAIL DISPATCH & ONBOARDING -->
                 <div id="view-email-dispatch" class="tab-panel hidden space-y-6">
                     <div class="border-b border-slate-800 pb-4">
-                        <h3 class="text-lg font-bold text-slate-100">Email Dispatching & Access Links Engine</h3>
-                        <p class="text-xs text-slate-400">Send custom portal invitation emails directly to Company Leaders & Department Heads or dispatch system activation emails.</p>
+                        <h3 class="text-lg font-bold text-slate-100">Email Onboarding & Workspace Dispatch</h3>
+                        <p class="text-xs text-slate-400">Send custom portal invitation links to Department Heads and Company Leaders.</p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Dispatch Form -->
-                        <div class="lg:col-span-2 bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-5">
+                        <div class="lg:col-span-2 bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                             <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4 text-indigo-400"></i> Direct Invitation Dispatcher
+                                <i data-lucide="send" class="w-4 h-4 text-indigo-400"></i> Dispatch Tenant Invite Link
                             </h4>
                             <form onsubmit="handleSendEmail(event)" class="space-y-4">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Target Company Tenant</label>
-                                        <select id="email-company-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                                            <option value="Apex Global Logistics">Apex Global Logistics</option>
-                                            <option value="NovaTech Solutions">NovaTech Solutions</option>
-                                            <option value="Vanguard Financials">Vanguard Financials</option>
+                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Target Tenant</label>
+                                        <select id="email-company-select" onchange="updateEmailTemplateLink()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                            <!-- Dynamic Dropdown -->
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Recipient Role Type</label>
+                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Recipient Role</label>
                                         <select id="email-role-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                                            <option value="Company Leader (CEO / C-Suite)">Company Leader (CEO / C-Suite)</option>
+                                            <option value="Company Leader (CEO)">Company Leader (CEO)</option>
                                             <option value="Department Head">Department Head</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Recipient Email Address</label>
-                                        <input type="email" id="email-recipient" required placeholder="ceo@company.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Recipient Email</label>
+                                        <input type="email" id="email-recipient" required placeholder="leader@company.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Dispatch Gateway Provider</label>
-                                        <select id="email-provider" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                                            <option value="Resend API">Resend API (Recommended)</option>
-                                            <option value="SendGrid API">SendGrid API</option>
-                                            <option value="Postmark Transactional">Postmark</option>
-                                            <option value="Custom SMTP Gateway">Custom SMTP</option>
+                                        <label class="block text-xs font-semibold text-slate-400 mb-1">Email Provider Gateway</label>
+                                        <select class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                            <option>Resend API (Active)</option>
+                                            <option>SendGrid API</option>
+                                            <option>Postmark SMTP</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Email Subject Line</label>
-                                    <input type="text" id="email-subject" value="Welcome to ROCEL-HUBEL Platform - Access Your Company Portal" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Message Body Preview</label>
-                                    <textarea id="email-body" rows="4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500">Hello,
-
-You have been granted access as a Company Leader / Department Head on ROCEL-HUBEL.
-
-Click the link below to verify your account, review pre-created departments, and begin appointing your internal team members:
-https://rocel-hubel.github.io/app/?tenant=apex-global
-
-Best regards,
-ROCEL-HUBEL Operations</textarea>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Email Message Preview</label>
+                                    <textarea id="email-body" rows="4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500"></textarea>
                                 </div>
                                 <div class="flex items-center justify-between pt-2">
                                     <span class="text-[11px] text-slate-500 flex items-center gap-1">
-                                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> TLS 1.3 Encrypted Email Payload
+                                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Direct Parameter Link Verified
                                     </span>
-                                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition">
-                                        <i data-lucide="send" class="w-4 h-4"></i> Dispatch Invitation Email
+                                    <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-lg transition">
+                                        <i data-lucide="send" class="w-4 h-4"></i> Send Email
                                     </button>
                                 </div>
                             </form>
                         </div>
 
-                        <!-- Email Audit Log Sidebar -->
                         <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                             <div>
-                                <h4 class="text-sm font-bold text-slate-200 mb-3 flex items-center justify-between">
-                                    <span>Dispatch Audit Log</span>
-                                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Live Status</span>
-                                </h4>
+                                <h4 class="text-sm font-bold text-slate-200 mb-3">Email Dispatch Audit Log</h4>
                                 <div id="email-audit-list" class="space-y-3 my-3">
                                     <!-- Dynamic Audit Items -->
                                 </div>
-                            </div>
-                            <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400">
-                                Automated welcome emails send unique activation links matching your GitHub host repository.
                             </div>
                         </div>
                     </div>
@@ -303,107 +294,139 @@ ROCEL-HUBEL Operations</textarea>
                 <!-- TAB 4: BANK DETAILS & PAYOUTS -->
                 <div id="view-payouts" class="tab-panel hidden space-y-6">
                     <div class="border-b border-slate-800 pb-4">
-                        <h3 class="text-lg font-bold text-slate-100">Bank Account & Payout Verification</h3>
-                        <p class="text-xs text-slate-400">Configure your receiving bank account details and track incoming subscription settlements.</p>
+                        <h3 class="text-lg font-bold text-slate-100">Bank Settlement & Direct Payouts</h3>
+                        <p class="text-xs text-slate-400">Configure global settlement accounts for receiving tenant platform subscriptions.</p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Connected Bank Form -->
                         <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6 space-y-4">
                             <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-                                <i data-lucide="landmark" class="w-4 h-4 text-emerald-400"></i> My Receiving Bank Account
+                                <i data-lucide="landmark" class="w-4 h-4 text-emerald-400"></i> Connected Receiving Bank
                             </h4>
                             <div class="space-y-3 text-xs">
                                 <div>
-                                    <label class="block text-slate-400 text-[11px] font-medium mb-1">Account Holder Name</label>
-                                    <input type="text" id="bank-holder" value="ROCEL-HUBEL Platform LLC" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-medium">
+                                    <label class="block text-slate-400 text-[11px] mb-1">Account Owner Name</label>
+                                    <input type="text" value="ROCEL-HUBEL Platform LLC" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
                                 </div>
                                 <div>
-                                    <label class="block text-slate-400 text-[11px] font-medium mb-1">Financial Institution</label>
-                                    <input type="text" id="bank-name" value="JPMorgan Chase Bank, N.A." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-medium">
+                                    <label class="block text-slate-400 text-[11px] mb-1">Bank Name</label>
+                                    <input type="text" value="JPMorgan Chase Bank, N.A." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
                                 </div>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-slate-400 text-[11px] font-medium mb-1">Account Number</label>
-                                        <input type="text" id="bank-acc" value="•••• •••• 8821" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
-                                    </div>
-                                    <div>
-                                        <label class="block text-slate-400 text-[11px] font-medium mb-1">Routing / Sort Code</label>
-                                        <input type="text" id="bank-routing" value="021000021" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
-                                    </div>
+                                <div>
+                                    <label class="block text-slate-400 text-[11px] mb-1">Account Number Target</label>
+                                    <input type="text" value="•••• •••• 8821" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
                                 </div>
                             </div>
-                            <button onclick="showToast('Receiving bank account configuration updated')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs rounded-xl transition">
-                                Update Bank Account Settings
+                            <button onclick="showToast('Bank settings updated successfully')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs rounded-xl transition">
+                                Update Settlement Details
                             </button>
                         </div>
 
-                        <!-- Payout Settlement Log -->
                         <div class="lg:col-span-2 bg-slate-950/60 border border-slate-800 rounded-2xl p-6">
                             <h4 class="text-sm font-bold text-slate-200 mb-4 flex items-center justify-between">
-                                <span>Recent Bank Deposit Settlements</span>
-                                <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full">Auto-Payouts Active</span>
+                                <span>Recent Tenant Settlements</span>
+                                <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-full">Auto Clearing Active</span>
                             </h4>
-                            <div class="space-y-3">
-                                <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                                            <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-xs font-bold text-slate-200">Apex Global Logistics - Monthly Plan</div>
-                                            <div class="text-[11px] text-slate-400">Ref: DEP-88219-CHASE • Webhook Verified</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xs font-bold text-emerald-400">+$2,499.00</div>
-                                        <div class="text-[10px] text-slate-500">Cleared in Bank</div>
-                                    </div>
-                                </div>
-                                <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                                            <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-xs font-bold text-slate-200">NovaTech Solutions - Pro Tier</div>
-                                            <div class="text-[11px] text-slate-400">Ref: DEP-88218-CHASE • Webhook Verified</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xs font-bold text-emerald-400">+$799.00</div>
-                                        <div class="text-[10px] text-slate-500">Cleared in Bank</div>
-                                    </div>
-                                </div>
+                            <div class="space-y-3" id="payout-settlements-list">
+                                <!-- Dynamic Render -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 5: PAYMENT PLATFORM -->
-                <div id="view-payment" class="tab-panel hidden space-y-6">
-                    <div class="flex items-center justify-between">
+                <!-- TAB 5: TENANT WORKSPACE OVERVIEW -->
+                <div id="view-workspace-overview" class="tab-panel hidden space-y-6">
+                    <!-- Dynamic Header Banner for Active Tenant -->
+                    <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 border border-indigo-500/30 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">Super Admin Payment Platform</h3>
-                            <p class="text-xs text-slate-400">Monitor tenant subscription statuses and simulate customer checkout flows.</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-xl text-white shadow-xl shadow-indigo-600/30" id="tenant-ws-icon">
+                                    A
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-xl font-bold text-slate-100" id="tenant-ws-name">Apex Global Logistics</h2>
+                                        <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" id="tenant-ws-plan">Enterprise Tier</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1" id="tenant-ws-desc">Isolated Workspace for Apex Global Logistics staff, accounting ledgers, and department heads.</p>
+                                </div>
+                            </div>
                         </div>
-                        <button onclick="simulateTenantCheckout()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition">
-                            <i data-lucide="play" class="w-4 h-4"></i> Test Tenant Checkout Simulator
-                        </button>
+
+                        <div class="flex items-center gap-3">
+                            <button onclick="switchTab('tenant-hr')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
+                                <i data-lucide="users" class="w-4 h-4"></i> Manage Staff Directory
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Metrics Grid for Selected Tenant -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase">Settled Subscriptions</span>
-                            <div class="text-2xl font-bold text-emerald-400 mt-1">16 Paid</div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Tenant Total Staff</span>
+                            <div class="text-2xl font-bold text-slate-100 mt-1" id="ws-metric-staff">0</div>
+                            <span class="text-[11px] text-slate-400 mt-1 block">Active Employees</span>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase">Unsettled / Pending</span>
-                            <div class="text-2xl font-bold text-amber-400 mt-1">2 Overdue</div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Departments</span>
+                            <div class="text-2xl font-bold text-slate-100 mt-1" id="ws-metric-depts">0</div>
+                            <span class="text-[11px] text-slate-400 mt-1 block">Pre-configured Units</span>
                         </div>
                         <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
-                            <span class="text-xs font-semibold text-slate-400 uppercase">Connected Gateway</span>
-                            <div class="text-2xl font-bold text-indigo-400 mt-1">Stripe Connect</div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Monthly Ledger Balance</span>
+                            <div class="text-2xl font-bold text-emerald-400 mt-1" id="ws-metric-ledger">$0.00</div>
+                            <span class="text-[11px] text-emerald-400 mt-1 block">Tenant Internal Accounts</span>
+                        </div>
+                        <div class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl">
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Department Heads</span>
+                            <div class="text-2xl font-bold text-slate-100 mt-1" id="ws-metric-heads">0</div>
+                            <span class="text-[11px] text-indigo-400 mt-1 block">Assigned Leaders</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Department Summary -->
+                        <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center justify-between">
+                                <span>Active Departments</span>
+                                <span class="text-xs text-indigo-400 font-normal">Tenant Specific</span>
+                            </h3>
+                            <div id="ws-dept-badges-list" class="flex flex-wrap gap-2 mb-4">
+                                <!-- Dynamic Badges -->
+                            </div>
+                            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300">
+                                🔒 <span class="font-bold text-indigo-400">Tenant Isolation Enforced:</span> Data viewed here belongs exclusively to <span class="font-bold text-slate-100" id="ws-isolation-name">this company</span>. No other tenant can read or modify these records.
+                            </div>
+                        </div>
+
+                        <!-- Direct Link Share Box -->
+                        <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-2xl space-y-3">
+                            <h3 class="text-sm font-bold text-slate-200">Direct Workspace Link</h3>
+                            <p class="text-xs text-slate-400">Share this direct URL with employees or leaders of this company to land directly on their isolated workspace:</p>
+                            <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between gap-2">
+                                <span class="font-mono text-xs text-indigo-400 truncate" id="ws-share-url-text">https://rocel-hubel.github.io/?tenant=apex-global</span>
+                                <button onclick="copyCurrentWorkspaceURL()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition shrink-0">
+                                    Copy Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: TENANT HR DIRECTORY -->
+                <div id="view-tenant-hr" class="tab-panel hidden space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-100">
+                                <span id="hr-tenant-title">Company</span> - Staff & HR Directory
+                            </h3>
+                            <p class="text-xs text-slate-400">Filter, search, and manage internal employee records for this active workspace.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="hr-search-input" onkeyup="filterHRStaff()" placeholder="Search employee or role..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 w-48 focus:outline-none focus:border-indigo-500">
+                            <button onclick="openAddEmployeeModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 shadow-lg transition shrink-0">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i> Add Staff Member
+                            </button>
                         </div>
                     </div>
 
@@ -411,53 +434,64 @@ ROCEL-HUBEL Operations</textarea>
                         <table class="w-full text-left text-xs text-slate-300">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase font-bold border-b border-slate-800">
                                 <tr>
-                                    <th class="p-4">Tenant Company</th>
-                                    <th class="p-4">Plan Amount</th>
-                                    <th class="p-4">Billing Cycle</th>
-                                    <th class="p-4">Settlement Status</th>
+                                    <th class="p-4">Employee Name</th>
+                                    <th class="p-4">Job Title / Role</th>
+                                    <th class="p-4">Department</th>
+                                    <th class="p-4">Work Email</th>
+                                    <th class="p-4">Salary / Pay</th>
                                     <th class="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="payment-table-body" class="divide-y divide-slate-800/60">
-                                <!-- Dynamic Render -->
+                            <tbody id="tenant-hr-table-body" class="divide-y divide-slate-800/60">
+                                <!-- Dynamic HR Directory -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- TAB 6: LEADERS & DEPT HEADS -->
-                <div id="view-exec-leaders" class="tab-panel hidden space-y-6">
-                    <div class="flex items-center justify-between">
+                <!-- TAB 7: TENANT FINANCE LEDGER -->
+                <div id="view-tenant-finance" class="tab-panel hidden space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">Company Leaders & Department Heads</h3>
-                            <p class="text-xs text-slate-400">Super Admin provisions only Company Leaders and Department Heads. Heads manage their own staff internally.</p>
+                            <h3 class="text-lg font-bold text-slate-100">
+                                <span id="finance-tenant-title">Company</span> - General Ledger
+                            </h3>
+                            <p class="text-xs text-slate-400">Isolated double-entry accounting records, revenues, and operating expenses.</p>
                         </div>
+                        <button onclick="openAddTransactionModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl flex items-center gap-2 transition shadow-lg shadow-emerald-600/20">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Record New Ledger Entry
+                        </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="exec-heads-grid">
-                        <!-- Dynamic Cards -->
+                    <div class="bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900/80 text-slate-400 uppercase font-bold border-b border-slate-800">
+                                <tr>
+                                    <th class="p-4">Transaction Reference</th>
+                                    <th class="p-4">Category</th>
+                                    <th class="p-4">Type</th>
+                                    <th class="p-4">Amount</th>
+                                    <th class="p-4">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tenant-ledger-table-body" class="divide-y divide-slate-800/60">
+                                <!-- Dynamic Ledger Items -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- TAB 7: HR MODULE -->
-                <div id="view-hr" class="tab-panel hidden space-y-6">
-                    <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6">
-                        <h3 class="text-base font-bold text-slate-100 mb-2">Company HR Directory & Attendance</h3>
-                        <p class="text-xs text-slate-400 mb-4">Internal staff records are restricted to Department Heads and HR managers of the specific tenant company.</p>
-                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300">
-                            🔒 <span class="font-bold text-indigo-400">Privacy Guarantee:</span> Staff appointments and personal employee records remain strictly within the tenant's isolated database space.
-                        </div>
+                <!-- TAB 8: TENANT DEPT HEADS -->
+                <div id="view-tenant-heads" class="tab-panel hidden space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-100">
+                            <span id="heads-tenant-title">Company</span> - Assigned Department Heads
+                        </h3>
+                        <p class="text-xs text-slate-400">Appointed leaders authorized to manage staff and sign off on department expenses.</p>
                     </div>
-                </div>
 
-                <!-- TAB 8: ACCOUNTING MODULE -->
-                <div id="view-accounting" class="tab-panel hidden space-y-6">
-                    <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-6">
-                        <h3 class="text-base font-bold text-slate-100 mb-2">General Ledger & Financial Accounting</h3>
-                        <p class="text-xs text-slate-400 mb-4">Double-entry bookkeeping, AR/AP ledgers, and expense approvals managed by tenant heads.</p>
-                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-300">
-                            🔒 <span class="font-bold text-indigo-400">Privacy Guarantee:</span> Company accounting records, expense claims, and payroll runs are encrypted and isolated per tenant.
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="tenant-heads-grid">
+                        <!-- Dynamic Dept Heads Cards -->
                     </div>
                 </div>
 
@@ -465,11 +499,11 @@ ROCEL-HUBEL Operations</textarea>
         </main>
     </div>
 
-    <!-- MODAL: ADD COMPANY -->
+    <!-- MODAL 1: ADD NEW COMPANY TENANT -->
     <div id="add-company-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-base font-bold text-slate-100">Add New Tenant Company</h3>
+                <h3 class="text-base font-bold text-slate-100">Create New Tenant Company</h3>
                 <button onclick="closeAddCompanyModal()" class="text-slate-400 hover:text-slate-200">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -477,49 +511,488 @@ ROCEL-HUBEL Operations</textarea>
             <form onsubmit="handleAddCompany(event)" class="space-y-4 text-xs">
                 <div>
                     <label class="block text-slate-400 font-semibold mb-1">Company Name</label>
-                    <input type="text" id="modal-company-name" required placeholder="Acme Logistics Corp" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="modal-company-name" required placeholder="Acme Global Inc" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-semibold mb-1">Subscription Tier</label>
+                    <label class="block text-slate-400 font-semibold mb-1">Subscription Plan</label>
                     <select id="modal-company-plan" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="Basic ($299/mo)">Basic ($299/mo)</option>
                         <option value="Pro Tier ($799/mo)">Pro Tier ($799/mo)</option>
-                        <option value="Enterprise ($2,499/mo)">Enterprise ($2,499/mo)</option>
+                        <option value="Enterprise Tier ($2,499/mo)">Enterprise Tier ($2,499/mo)</option>
+                        <option value="Basic Tier ($299/mo)">Basic Tier ($299/mo)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-semibold mb-1">Pre-Create Initial Departments</label>
+                    <label class="block text-slate-400 font-semibold mb-1">Pre-Create Initial Departments (Comma Separated)</label>
                     <input type="text" id="modal-company-depts" value="Executive, Finance, Engineering, HR" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
                 <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 transition">
-                    Create Tenant & Generate GitHub Invite Link
+                    Create Workspace & Dynamic URL Link
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATION LOGIC -->
+    <!-- MODAL 2: ADD STAFF TO TENANT -->
+    <div id="add-employee-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-slate-100">Add Employee to Active Workspace</h3>
+                <button onclick="closeAddEmployeeModal()" class="text-slate-400 hover:text-slate-200">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddEmployee(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-semibold mb-1">Full Name</label>
+                    <input type="text" id="modal-emp-name" required placeholder="Jane Doe" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">Job Title</label>
+                        <input type="text" id="modal-emp-role" required placeholder="Senior Engineer" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">Department</label>
+                        <select id="modal-emp-dept" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <!-- Dynamic Options -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-semibold mb-1">Email Address</label>
+                    <input type="email" id="modal-emp-email" required placeholder="jane@company.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-semibold mb-1">Annual Compensation ($)</label>
+                    <input type="text" id="modal-emp-salary" value="$115,000/yr" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg transition">
+                    Save Employee Record
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADD LEDGER TRANSACTION -->
+    <div id="add-transaction-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-slate-100">Record General Ledger Entry</h3>
+                <button onclick="closeAddTransactionModal()" class="text-slate-400 hover:text-slate-200">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddTransaction(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-semibold mb-1">Transaction Description</label>
+                    <input type="text" id="modal-tx-desc" required placeholder="Client Retainer Payment" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">Type</label>
+                        <select id="modal-tx-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="Credit (Revenue)">Credit (Revenue)</option>
+                            <option value="Debit (Expense)">Debit (Expense)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">Amount ($)</label>
+                        <input type="number" id="modal-tx-amount" required placeholder="5000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg transition">
+                    Post to Tenant Ledger
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC & STATE ENGINE -->
     <script>
-        // --- DATA STATE (UPDATED TO ROCEL-HUBEL GITHUB FORMAT) ---
-        let companies = [
-            { id: 1, name: "Apex Global Logistics", domain: "rocel-hubel.github.io/app/?tenant=apex-global", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Finance", "Logistics", "HR"], status: "Settled", paidDate: "2026-09-01" },
-            { id: 2, name: "NovaTech Solutions", domain: "rocel-hubel.github.io/app/?tenant=novatech", plan: "Pro Tier ($799/mo)", depts: ["Executive", "Engineering", "Sales"], status: "Settled", paidDate: "2026-09-03" },
-            { id: 3, name: "Vanguard Financials", domain: "rocel-hubel.github.io/app/?tenant=vanguard", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Accounting", "Risk"], status: "Pending", paidDate: "-" }
-        ];
+        // --- MULTI-TENANT APPLICATION DATA STORE ---
+        let tenantData = {
+            "apex-global": {
+                id: "apex-global",
+                name: "Apex Global Logistics",
+                plan: "Enterprise ($2,499/mo)",
+                status: "Settled",
+                depts: ["Executive", "Finance", "Logistics", "HR"],
+                description: "Global freight routing, fleet tracking, and supply chain management workspace.",
+                staff: [
+                    { name: "Eleanor Vance", role: "CEO & Company Leader", dept: "Executive", email: "eleanor@apexglobal.com", salary: "$240,000/yr" },
+                    { name: "Marcus Brody", role: "Head of Finance", dept: "Finance", email: "marcus@apexglobal.com", salary: "$165,000/yr" },
+                    { name: "David Kim", role: "Logistics Manager", dept: "Logistics", email: "david@apexglobal.com", salary: "$110,000/yr" },
+                    { name: "Sarah Jenkins", role: "Senior HR Specialist", dept: "HR", email: "s.jenkins@apexglobal.com", salary: "$92,000/yr" }
+                ],
+                ledger: [
+                    { ref: "INV-88102", category: "Freight Revenue", type: "Credit", amount: 48500, date: "2026-09-20" },
+                    { ref: "EXP-33201", category: "Fleet Fuel & Maintenance", type: "Debit", amount: 12400, date: "2026-09-22" },
+                    { ref: "INV-88109", category: "Logistics Retainer", type: "Credit", amount: 21000, date: "2026-09-24" }
+                ],
+                heads: [
+                    { name: "Eleanor Vance", role: "Company Leader (CEO)", status: "Active Access" },
+                    { name: "Marcus Brody", role: "Head of Finance", status: "Active Access" }
+                ]
+            },
+            "novatech": {
+                id: "novatech",
+                name: "NovaTech Solutions",
+                plan: "Pro Tier ($799/mo)",
+                status: "Settled",
+                depts: ["Executive", "Engineering", "Product", "Sales"],
+                description: "Cloud software engineering, SaaS API platforms, and AI systems development.",
+                staff: [
+                    { name: "Dr. Henry Wu", role: "Head of Engineering", dept: "Engineering", email: "h.wu@novatech.io", salary: "$195,000/yr" },
+                    { name: "Claire Dearing", role: "VP of Product", dept: "Product", email: "claire@novatech.io", salary: "$170,000/yr" },
+                    { name: "Owen Grady", role: "Lead Solutions Architect", dept: "Engineering", email: "owen@novatech.io", salary: "$150,000/yr" }
+                ],
+                ledger: [
+                    { ref: "SUB-99401", category: "API Subscription Billing", type: "Credit", amount: 34000, date: "2026-09-18" },
+                    { ref: "AWS-44109", category: "Cloud Hosting Infrastructure", type: "Debit", amount: 8900, date: "2026-09-21" }
+                ],
+                heads: [
+                    { name: "Dr. Henry Wu", role: "Head of Engineering", status: "Active Access" }
+                ]
+            },
+            "vanguard": {
+                id: "vanguard",
+                name: "Vanguard Financials",
+                plan: "Enterprise ($2,499/mo)",
+                status: "Pending",
+                depts: ["Executive", "Accounting", "Risk Management"],
+                description: "Institutional wealth management, compliance auditing, and risk analysis portal.",
+                staff: [
+                    { name: "Sarah Connor", role: "Managing Director", dept: "Executive", email: "s.connor@vanguardfin.com", salary: "$280,000/yr" },
+                    { name: "Kyle Reese", role: "Chief Risk Officer", dept: "Risk Management", email: "kreese@vanguardfin.com", salary: "$185,000/yr" }
+                ],
+                ledger: [
+                    { ref: "MANAGEMENT-01", category: "Wealth Advisory Fees", type: "Credit", amount: 62000, date: "2026-09-15" }
+                ],
+                heads: [
+                    { name: "Sarah Connor", role: "Company Leader (CEO)", status: "Pending Approval" }
+                ]
+            }
+        };
 
+        let activeTenantId = null; // null = Super Admin Mode, string = Tenant Workspace Mode
         let emailLogs = [
-            { id: 101, recipient: "ceo@apexglobal.com", role: "Company Leader", company: "Apex Global Logistics", provider: "Resend API", status: "Delivered", time: "10 mins ago" },
-            { id: 102, recipient: "head.engineering@novatech.io", role: "Department Head", company: "NovaTech Solutions", provider: "SendGrid API", status: "Delivered", time: "1 hour ago" }
+            { id: 101, recipient: "eleanor@apexglobal.com", role: "Company Leader", company: "Apex Global Logistics", provider: "Resend API", status: "Delivered", time: "10 mins ago" },
+            { id: 102, recipient: "h.wu@novatech.io", role: "Department Head", company: "NovaTech Solutions", provider: "SendGrid API", status: "Delivered", time: "1 hour ago" }
         ];
 
-        let execHeads = [
-            { name: "Eleanor Vance", role: "Company Leader (CEO)", company: "Apex Global Logistics", status: "Active Access" },
-            { name: "Marcus Brody", role: "Head of Finance", company: "Apex Global Logistics", status: "Active Access" },
-            { name: "Dr. Henry Wu", role: "Head of Engineering", company: "NovaTech Solutions", status: "Active Access" },
-            { name: "Sarah Connor", role: "Company Leader (CEO)", company: "Vanguard Financials", status: "Pending Approval" }
-        ];
+        // --- URL PARAMETER ROUTING HANDLER ---
+        function handleURLRouting() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tenantSlug = urlParams.get('tenant');
 
-        // --- TAB NAVIGATION ---
+            if (tenantSlug && tenantData[tenantSlug]) {
+                // Load specific workspace dynamically
+                setActiveTenantWorkspace(tenantSlug, false);
+            } else {
+                // Default to Super Admin Mode
+                setSuperAdminMode(false);
+            }
+        }
+
+        // --- SWITCH TENANT WORKSPACE CONTEXT ---
+        function setActiveTenantWorkspace(tenantId, updateURL = true) {
+            if (!tenantData[tenantId]) return;
+
+            activeTenantId = tenantId;
+            const tenant = tenantData[tenantId];
+
+            // Update URL without page reload using HTML5 History API
+            if (updateURL) {
+                const newUrl = window.location.pathname + `?tenant=${tenantId}`;
+                window.history.pushState({ path: newUrl }, '', newUrl);
+            }
+
+            // Update URL Display Pill in Top Bar
+            document.getElementById('current-url-display').innerText = `https://rocel-hubel.github.io/?tenant=${tenantId}`;
+            document.getElementById('scope-mode-badge').innerText = tenant.name;
+            document.getElementById('scope-mode-badge').className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 truncate max-w-[120px]";
+            document.getElementById('sidebar-tenant-select').value = tenantId;
+            document.getElementById('active-tenant-indicator-badge').innerText = `Workspace: ${tenant.name}`;
+            document.getElementById('nav-tenant-label').innerText = tenant.name.split(' ')[0];
+
+            // Render Tenant Workspace Views
+            renderTenantWorkspaceData(tenant);
+
+            // Switch view panel to workspace overview
+            switchTab('workspace-overview');
+            showToast(`Loaded isolated workspace for "${tenant.name}"`);
+        }
+
+        function setSuperAdminMode(updateURL = true) {
+            activeTenantId = null;
+
+            if (updateURL) {
+                window.history.pushState({ path: window.location.pathname }, '', window.location.pathname);
+            }
+
+            document.getElementById('current-url-display').innerText = `https://rocel-hubel.github.io/`;
+            document.getElementById('scope-mode-badge').innerText = "Super Admin Mode";
+            document.getElementById('scope-mode-badge').className = "px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
+            document.getElementById('sidebar-tenant-select').value = "super-admin";
+            document.getElementById('active-tenant-indicator-badge').innerText = "Global Admin View";
+            document.getElementById('nav-tenant-label').innerText = "Select Tenant";
+
+            switchTab('dashboard');
+            showToast("Switched to Global Super Admin View");
+        }
+
+        function handleTenantSelectChange(val) {
+            if (val === 'super-admin') {
+                setSuperAdminMode(true);
+            } else {
+                setActiveTenantWorkspace(val, true);
+            }
+        }
+
+        // --- RENDER DYNAMIC TENANT WORKSPACE DATA ---
+        function renderTenantWorkspaceData(tenant) {
+            // Workspace Overview Tab Updates
+            document.getElementById('tenant-ws-name').innerText = tenant.name;
+            document.getElementById('tenant-ws-plan').innerText = tenant.plan;
+            document.getElementById('tenant-ws-desc').innerText = tenant.description;
+            document.getElementById('tenant-ws-icon').innerText = tenant.name[0];
+            document.getElementById('ws-metric-staff').innerText = tenant.staff.length;
+            document.getElementById('ws-metric-depts').innerText = tenant.depts.length;
+            document.getElementById('ws-metric-heads').innerText = tenant.heads.length;
+            document.getElementById('ws-isolation-name').innerText = tenant.name;
+            document.getElementById('ws-share-url-text').innerText = `https://rocel-hubel.github.io/?tenant=${tenant.id}`;
+
+            // Calculate Ledger Net Total
+            const netLedger = tenant.ledger.reduce((acc, item) => item.type === 'Credit' ? acc + item.amount : acc - item.amount, 0);
+            document.getElementById('ws-metric-ledger').innerText = `$${netLedger.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            // Render Department Badges
+            document.getElementById('ws-dept-badges-list').innerHTML = tenant.depts.map(d => `
+                <span class="px-3 py-1 bg-slate-900 border border-slate-800 text-indigo-300 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                    <i data-lucide="folder" class="w-3.5 h-3.5 text-indigo-400"></i> ${d}
+                </span>
+            `).join('');
+
+            // HR Directory Header & Table
+            document.getElementById('hr-tenant-title').innerText = tenant.name;
+            renderHRDirectory(tenant.staff);
+
+            // Ledger Tab Header & Table
+            document.getElementById('finance-tenant-title').innerText = tenant.name;
+            renderLedgerTable(tenant.ledger);
+
+            // Department Heads Header & Cards
+            document.getElementById('heads-tenant-title').innerText = tenant.name;
+            renderDeptHeadsCards(tenant.heads);
+
+            // Populate Employee Modal Department Select
+            const deptSelect = document.getElementById('modal-emp-dept');
+            deptSelect.innerHTML = tenant.depts.map(d => `<option value="${d}">${d}</option>`).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderHRDirectory(staffArray) {
+            const body = document.getElementById('tenant-hr-table-body');
+            if (!staffArray || staffArray.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No staff members found in this tenant directory.</td></tr>`;
+                return;
+            }
+
+            body.innerHTML = staffArray.map((s, idx) => `
+                <tr class="hover:bg-slate-900/40 transition">
+                    <td class="p-4 font-bold text-slate-200 flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-slate-800 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                            ${s.name.split(' ').map(n=>n[0]).join('')}
+                        </div>
+                        ${s.name}
+                    </td>
+                    <td class="p-4 text-slate-300 font-medium">${s.role}</td>
+                    <td class="p-4"><span class="bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md font-medium text-[11px]">${s.dept}</span></td>
+                    <td class="p-4 font-mono text-slate-400 text-[11px]">${s.email}</td>
+                    <td class="p-4 font-semibold text-emerald-400">${s.salary}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteStaffMember(${idx})" class="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition" title="Remove Member">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterHRStaff() {
+            if (!activeTenantId) return;
+            const query = document.getElementById('hr-search-input').value.toLowerCase();
+            const staff = tenantData[activeTenantId].staff;
+            const filtered = staff.filter(s => s.name.toLowerCase().includes(query) || s.role.toLowerCase().includes(query) || s.dept.toLowerCase().includes(query));
+            renderHRDirectory(filtered);
+        }
+
+        function renderLedgerTable(ledgerArray) {
+            const body = document.getElementById('tenant-ledger-table-body');
+            body.innerHTML = ledgerArray.map(item => `
+                <tr class="hover:bg-slate-900/40 transition">
+                    <td class="p-4 font-mono text-indigo-400 font-semibold">${item.ref}</td>
+                    <td class="p-4 text-slate-200 font-medium">${item.category}</td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${item.type === 'Credit' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">
+                            ${item.type}
+                        </span>
+                    </td>
+                    <td class="p-4 font-mono font-bold ${item.type === 'Credit' ? 'text-emerald-400' : 'text-rose-400'}">
+                        ${item.type === 'Credit' ? '+' : '-'}$${item.amount.toLocaleString()}
+                    </td>
+                    <td class="p-4 text-slate-400 text-[11px]">${item.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDeptHeadsCards(headsArray) {
+            const grid = document.getElementById('tenant-heads-grid');
+            grid.innerHTML = headsArray.map(h => `
+                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-sm">
+                            ${h.name.split(' ').map(n=>n[0]).join('')}
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">${h.name}</div>
+                            <div class="text-[11px] text-indigo-400 font-medium">${h.role}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
+                        ${h.status}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // --- RENDER SUPER ADMIN TABLES ---
+        function renderGlobalData() {
+            // Populate Dropdowns with Tenants
+            const selectOptgroup = document.getElementById('tenant-optgroup');
+            const emailSelect = document.getElementById('email-company-select');
+            
+            let optionsHTML = "";
+            let emailOptionsHTML = "";
+            let globalStaffCount = 0;
+
+            Object.values(tenantData).forEach(t => {
+                optionsHTML += `<option value="${t.id}">${t.name}</option>`;
+                emailOptionsHTML += `<option value="${t.id}">${t.name}</option>`;
+                globalStaffCount += t.staff.length;
+            });
+
+            selectOptgroup.innerHTML = optionsHTML;
+            if (emailSelect) emailSelect.innerHTML = emailOptionsHTML;
+            document.getElementById('global-employee-count').innerText = globalStaffCount;
+
+            // Render Companies Table
+            const companyBody = document.getElementById('company-table-body');
+            companyBody.innerHTML = Object.values(tenantData).map(c => `
+                <tr class="hover:bg-slate-900/40 transition">
+                    <td class="p-4">
+                        <button onclick="setActiveTenantWorkspace('${c.id}')" class="font-bold text-slate-100 hover:text-indigo-400 transition text-left">
+                            ${c.name}
+                        </button>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <span onclick="setActiveTenantWorkspace('${c.id}')" class="font-mono text-[11px] text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20 cursor-pointer hover:underline">
+                                https://rocel-hubel.github.io/?tenant=${c.id}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="p-4 font-semibold text-slate-200">${c.plan}</td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${c.depts.map(d => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md">${d}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="setActiveTenantWorkspace('${c.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition">
+                            Switch Workspace
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Render Quick Tenants on Dashboard
+            const quickList = document.getElementById('quick-tenant-list');
+            quickList.innerHTML = Object.values(tenantData).map(c => `
+                <div onclick="setActiveTenantWorkspace('${c.id}')" class="p-3 bg-slate-900 hover:bg-slate-850 border border-slate-800 rounded-xl flex items-center justify-between cursor-pointer transition">
+                    <div>
+                        <div class="text-xs font-bold text-slate-200">${c.name}</div>
+                        <div class="text-[10px] font-mono text-indigo-400">?tenant=${c.id}</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+                </div>
+            `).join('');
+
+            // Render Payout Settlements
+            const settlementList = document.getElementById('payout-settlements-list');
+            settlementList.innerHTML = Object.values(tenantData).map(c => `
+                <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                            <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">${c.name} - ${c.plan}</div>
+                            <div class="text-[11px] text-slate-400">Ref: DEP-${c.id.toUpperCase()}-CHASE • Verified</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-bold text-emerald-400">+${c.plan.split(' ')[1]}</div>
+                        <div class="text-[10px] text-slate-500">Cleared in Bank</div>
+                    </div>
+                </div>
+            `).join('');
+
+            renderEmailLogs();
+            updateEmailTemplateLink();
+            lucide.createIcons();
+        }
+
+        function renderEmailLogs() {
+            const list = document.getElementById('email-audit-list');
+            list.innerHTML = emailLogs.map(log => `
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-200">${log.recipient}</span>
+                        <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">${log.status}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                        <span>${log.company}</span>
+                        <span class="text-slate-500">${log.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateEmailTemplateLink() {
+            const selectedTenantId = document.getElementById('email-company-select').value;
+            const tenant = tenantData[selectedTenantId];
+            if (!tenant) return;
+
+            document.getElementById('email-body').value = `Hello,
+
+You have been granted access as a Department Head / Leader for ${tenant.name} on ROCEL-HUBEL.
+
+Click the direct parameter link below to open your workspace:
+https://rocel-hubel.github.io/?tenant=${tenant.id}
+
+Best regards,
+ROCEL-HUBEL Operations Team`;
+        }
+
+        // --- TAB SWITCHING NAVIGATION ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(item => {
@@ -537,219 +1010,154 @@ ROCEL-HUBEL Operations</textarea>
             }
 
             const titles = {
-                'dashboard': 'Overview & System Analytics',
-                'companies': 'Tenant Companies & Invite Links',
-                'email-dispatch': 'Email Dispatching & Access Links Hub',
-                'payouts': 'Bank Account & Payout Verification',
-                'payment': 'Payment Platform & Subscription Billing',
-                'exec-leaders': 'Company Leaders & Department Heads',
-                'hr': 'HR Operations Hub',
-                'accounting': 'General Ledger & Financial Accounting'
+                'dashboard': 'Global Overview & Analytics',
+                'companies': 'Company Tenants & Dynamic Workspaces',
+                'email-dispatch': 'Onboarding Email Dispatcher',
+                'payouts': 'Bank Settlement & Direct Payouts',
+                'workspace-overview': 'Tenant Workspace Overview',
+                'tenant-hr': 'Staff & HR Directory',
+                'tenant-finance': 'General Accounting Ledger',
+                'tenant-heads': 'Department Heads & Access Scope'
             };
             document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
         }
 
-        // --- RENDER TABLES ---
-        function renderCompanies() {
-            const body = document.getElementById('company-table-body');
-            body.innerHTML = companies.map(c => `
-                <tr class="hover:bg-slate-900/40 transition">
-                    <td class="p-4 font-bold text-slate-100">${c.name}</td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="font-mono text-[11px] text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20">
-                                https://${c.domain}
-                            </span>
-                            <button onclick="copyInviteLink('https://${c.domain}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="Copy GitHub Access Link">
-                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td class="p-4"><span class="font-semibold text-slate-200">${c.plan}</span></td>
-                    <td class="p-4">
-                        <div class="flex flex-wrap gap-1">
-                            ${c.depts.map(d => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-medium">${d}</span>`).join('')}
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${c.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
-                            ${c.status}
-                        </span>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button onclick="dispatchDirectEmail('${c.name}')" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-lg text-xs font-medium transition">
-                            Send Email Link
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+        // --- ACTIONS & MODAL HANDLERS ---
+        function copyCurrentWorkspaceURL() {
+            const url = activeTenantId ? 
+                `https://rocel-hubel.github.io/?tenant=${activeTenantId}` : 
+                `https://rocel-hubel.github.io/`;
+            
+            // Clipboard copy with fallback
+            const el = document.createElement('textarea');
+            el.value = url;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
 
-            renderPayments();
-            lucide.createIcons();
-        }
-
-        function renderPayments() {
-            const body = document.getElementById('payment-table-body');
-            body.innerHTML = companies.map(c => `
-                <tr class="hover:bg-slate-900/40 transition">
-                    <td class="p-4 font-bold text-slate-200">${c.name}</td>
-                    <td class="p-4 font-mono font-semibold text-slate-100">${c.plan.split(' ')[1]}</td>
-                    <td class="p-4 text-slate-400">Monthly Recurring</td>
-                    <td class="p-4">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${c.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">
-                            ${c.status === 'Settled' ? '✓ Settled & Cleared' : '⏳ Awaiting Payment'}
-                        </span>
-                    </td>
-                    <td class="p-4 text-right">
-                        ${c.status === 'Pending' ? 
-                            `<button onclick="settlePayment(${c.id})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium text-xs shadow-md transition">Confirm Payment</button>` : 
-                            `<span class="text-xs text-slate-500 font-mono">Ref: DEP-${c.id}982</span>`
-                        }
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderEmailLogs() {
-            const list = document.getElementById('email-audit-list');
-            list.innerHTML = emailLogs.map(log => `
-                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="font-bold text-slate-200">${log.recipient}</span>
-                        <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">${log.status}</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
-                        <span>${log.company} • ${log.role}</span>
-                        <span class="text-slate-500">${log.time}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderExecHeads() {
-            const grid = document.getElementById('exec-heads-grid');
-            grid.innerHTML = execHeads.map((h, i) => `
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-sm">
-                            ${h.name.split(' ').map(n=>n[0]).join('')}
-                        </div>
-                        <div>
-                            <div class="text-xs font-bold text-slate-200">${h.name}</div>
-                            <div class="text-[11px] text-indigo-400 font-medium">${h.role}</div>
-                            <div class="text-[10px] text-slate-500">${h.company}</div>
-                        </div>
-                    </div>
-                    <div>
-                        ${h.status === 'Pending Approval' ? 
-                            `<button onclick="approveHead(${i})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-lg shadow-md transition">Approve Access</button>` :
-                            `<span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-bold">Approved Head</span>`
-                        }
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- ACTIONS ---
-        function copyInviteLink(url) {
-            navigator.clipboard.writeText(url);
-            showToast(`Invite link copied to clipboard: ${url}`);
-        }
-
-        function dispatchDirectEmail(companyName) {
-            switchTab('email-dispatch');
-            document.getElementById('email-company-select').value = companyName;
-            showToast(`Selected ${companyName} for direct onboarding email dispatch`);
+            showToast(`Copied direct URL: ${url}`);
         }
 
         function handleSendEmail(e) {
             e.preventDefault();
             const recipient = document.getElementById('email-recipient').value;
-            const company = document.getElementById('email-company-select').value;
-            const role = document.getElementById('email-role-select').value;
-            const provider = document.getElementById('email-provider').value;
+            const tenantId = document.getElementById('email-company-select').value;
+            const tenant = tenantData[tenantId];
 
             emailLogs.unshift({
                 id: Date.now(),
                 recipient: recipient,
-                role: role,
-                company: company,
-                provider: provider,
+                role: document.getElementById('email-role-select').value,
+                company: tenant.name,
+                provider: "Resend API",
                 status: "Delivered",
                 time: "Just now"
             });
 
             renderEmailLogs();
-            showToast(`Onboarding email dispatched safely via ${provider} to ${recipient}`);
+            showToast(`Invitation email dispatched to ${recipient}`);
         }
 
-        function settlePayment(id) {
-            const comp = companies.find(c => c.id === id);
-            if(comp) {
-                comp.status = 'Settled';
-                comp.paidDate = new Date().toISOString().split('T')[0];
-                renderCompanies();
-                showToast(`Subscription payment confirmed for ${comp.name}. Funds cleared.`);
-            }
-        }
-
-        function approveHead(index) {
-            execHeads[index].status = 'Active Access';
-            renderExecHeads();
-            showToast(`Approved access for ${execHeads[index].name}. System welcome email sent.`);
-        }
-
-        function simulateTenantCheckout() {
-            showToast('Simulating tenant checkout process...');
-            setTimeout(() => {
-                const pendingComp = companies.find(c => c.status === 'Pending');
-                if(pendingComp) {
-                    settlePayment(pendingComp.id);
-                } else {
-                    showToast('All company subscriptions are already settled!');
-                }
-            }, 1200);
-        }
-
-        function openAddCompanyModal() {
-            document.getElementById('add-company-modal').classList.remove('hidden');
-        }
-
-        function closeAddCompanyModal() {
-            document.getElementById('add-company-modal').classList.add('hidden');
-        }
+        // Add Tenant Modal
+        function openAddCompanyModal() { document.getElementById('add-company-modal').classList.remove('hidden'); }
+        function closeAddCompanyModal() { document.getElementById('add-company-modal').classList.add('hidden'); }
 
         function handleAddCompany(e) {
             e.preventDefault();
             const name = document.getElementById('modal-company-name').value;
             const plan = document.getElementById('modal-company-plan').value;
             const depts = document.getElementById('modal-company-depts').value.split(',').map(s=>s.trim());
-            const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-            const domain = `rocel-hubel.github.io/app/?tenant=${slug}`;
+            const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
-            companies.push({
-                id: Date.now(),
+            tenantData[id] = {
+                id: id,
                 name: name,
-                domain: domain,
                 plan: plan,
+                status: 'Settled',
                 depts: depts,
-                status: 'Pending',
-                paidDate: '-'
+                description: `${name} isolated multi-tenant corporate workspace environment.`,
+                staff: [
+                    { name: "Initial Executive Head", role: "Company Leader", dept: depts[0] || "Executive", email: `head@${id}.com`, salary: "$150,000/yr" }
+                ],
+                ledger: [
+                    { ref: "INIT-01", category: "Account Setup Deposit", type: "Credit", amount: 10000, date: new Date().toISOString().split('T')[0] }
+                ],
+                heads: [
+                    { name: "Initial Executive Head", role: "Company Leader", status: "Active Access" }
+                ]
+            };
+
+            renderGlobalData();
+            closeAddCompanyModal();
+            setActiveTenantWorkspace(id, true);
+        }
+
+        // Add Staff Modal
+        function openAddEmployeeModal() { document.getElementById('add-employee-modal').classList.remove('hidden'); }
+        function closeAddEmployeeModal() { document.getElementById('add-employee-modal').classList.add('hidden'); }
+
+        function handleAddEmployee(e) {
+            e.preventDefault();
+            if (!activeTenantId) return;
+
+            const name = document.getElementById('modal-emp-name').value;
+            const role = document.getElementById('modal-emp-role').value;
+            const dept = document.getElementById('modal-emp-dept').value;
+            const email = document.getElementById('modal-emp-email').value;
+            const salary = document.getElementById('modal-emp-salary').value;
+
+            tenantData[activeTenantId].staff.push({ name, role, dept, email, salary });
+            renderHRDirectory(tenantData[activeTenantId].staff);
+            closeAddEmployeeModal();
+            showToast(`Added ${name} to ${tenantData[activeTenantId].name} staff directory`);
+        }
+
+        function deleteStaffMember(index) {
+            if (!activeTenantId) return;
+            const removed = tenantData[activeTenantId].staff.splice(index, 1);
+            renderHRDirectory(tenantData[activeTenantId].staff);
+            showToast(`Removed staff record for ${removed[0]?.name}`);
+        }
+
+        // Add Ledger Entry Modal
+        function openAddTransactionModal() { document.getElementById('add-transaction-modal').classList.remove('hidden'); }
+        function closeAddTransactionModal() { document.getElementById('add-transaction-modal').classList.add('hidden'); }
+
+        function handleAddTransaction(e) {
+            e.preventDefault();
+            if (!activeTenantId) return;
+
+            const desc = document.getElementById('modal-tx-desc').value;
+            const rawType = document.getElementById('modal-tx-type').value;
+            const type = rawType.includes('Credit') ? 'Credit' : 'Debit';
+            const amount = parseFloat(document.getElementById('modal-tx-amount').value);
+
+            tenantData[activeTenantId].ledger.unshift({
+                ref: `TX-${Math.floor(1000 + Math.random() * 9000)}`,
+                category: desc,
+                type: type,
+                amount: amount,
+                date: new Date().toISOString().split('T')[0]
             });
 
-            renderCompanies();
-            closeAddCompanyModal();
-            showToast(`Tenant "${name}" created! Link: https://${domain}`);
+            renderLedgerTable(tenantData[activeTenantId].ledger);
+            // Recalculate metric
+            const netLedger = tenantData[activeTenantId].ledger.reduce((acc, item) => item.type === 'Credit' ? acc + item.amount : acc - item.amount, 0);
+            document.getElementById('ws-metric-ledger').innerText = `$${netLedger.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            closeAddTransactionModal();
+            showToast(`Recorded transaction into ${tenantData[activeTenantId].name} ledger`);
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            toast.classList.remove('-translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
-                toast.classList.add('translate-y-[-100px]', 'opacity-0');
-            }, 3000);
+                toast.classList.add('-translate-y-20', 'opacity-0');
+            }, 2800);
         }
 
         function initChart() {
@@ -759,7 +1167,7 @@ ROCEL-HUBEL Operations</textarea>
                 data: {
                     labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep'],
                     datasets: [{
-                        label: 'Cleared Monthly Revenue ($)',
+                        label: 'Platform MRR Revenue ($)',
                         data: [14200, 16800, 19500, 21000, 24800],
                         borderColor: '#6366f1',
                         backgroundColor: 'rgba(99, 102, 241, 0.1)',
@@ -778,12 +1186,16 @@ ROCEL-HUBEL Operations</textarea>
             });
         }
 
-        // INITIALIZE
+        // Handle Browser Back / Forward buttons
+        window.onpopstate = function() {
+            handleURLRouting();
+        };
+
+        // INITIALIZE ON LOAD
         window.onload = () => {
-            renderCompanies();
-            renderEmailLogs();
-            renderExecHeads();
+            renderGlobalData();
             initChart();
+            handleURLRouting();
             lucide.createIcons();
         };
     </script>
