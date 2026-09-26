@@ -28,7 +28,7 @@
                             A
                         </div>
                         <div>
-                            <h1 class="font-bold text-slate-100 tracking-wide text-base leading-none">AURA SaaS</h1>
+                            <h1 class="font-bold text-slate-100 tracking-wide text-base leading-none">ROCEL-HUBEL</h1>
                             <span class="text-[11px] text-slate-400 font-medium">Enterprise Control Hub</span>
                         </div>
                     </div>
@@ -40,8 +40,8 @@
                         <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Active View Role</span>
                         <div id="current-role-badge" class="text-xs font-bold text-indigo-400 mt-0.5">Super Admin</div>
                     </div>
-                    <button onclick="openRoleSwitcher()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition" title="Switch Portal Role">
-                        <i data-lucide="arrows-right-left" class="w-4 h-4"></i>
+                    <button onclick="showToast('Super Admin Role active')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition" title="System Authority">
+                        <i data-lucide="shield" class="w-4 h-4"></i>
                     </button>
                 </div>
 
@@ -84,11 +84,11 @@
             <div class="p-4 border-t border-slate-800/80 bg-slate-950/50">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm">
-                        SA
+                        RH
                     </div>
                     <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-slate-200 truncate">Platform Administrator</div>
-                        <div class="text-[11px] text-slate-400 truncate">owner@aurasaas.io</div>
+                        <div class="text-xs font-bold text-slate-200 truncate">ROCEL-HUBEL Admin</div>
+                        <div class="text-[11px] text-slate-400 truncate">owner@rocel-hubel.github.io</div>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                 <div class="flex items-center gap-3">
                     <h2 id="page-title" class="text-lg font-bold text-slate-100">Overview & System Analytics</h2>
                     <span id="tenant-privacy-tag" class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        Zero-Trust Multi-Tenant Isolation
+                        GitHub Hosted Workspace
                     </span>
                 </div>
                 <div class="flex items-center gap-4">
@@ -111,7 +111,7 @@
                         <span class="text-xs font-bold text-slate-200">JPMorgan Chase (****8821)</span>
                     </div>
                     <div class="h-8 w-[1px] bg-slate-800"></div>
-                    <button onclick="showToast('Platform metrics re-synchronized with live ledgers')" class="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/60 hover:bg-slate-800 rounded-xl transition">
+                    <button onclick="showToast('Platform metrics re-synchronized')" class="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/60 hover:bg-slate-800 rounded-xl transition">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -155,12 +155,12 @@
                         <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
                             <div>
                                 <h3 class="text-base font-bold text-slate-200 mb-2">Platform Access Scope</h3>
-                                <p class="text-xs text-slate-400 leading-relaxed">As the Super Admin, your account governs subscription tiers, company tenant usage rights, bank deposit routing, and approving Department Head accounts.</p>
+                                <p class="text-xs text-slate-400 leading-relaxed">As the Super Admin of ROCEL-HUBEL, your account governs subscription tiers, company tenant usage rights, bank deposit routing, and approving Department Head accounts.</p>
                             </div>
                             <div class="space-y-3 my-4">
                                 <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <span class="text-xs font-medium text-slate-300">Internal Employee Directories</span>
-                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Tenant Isolated</span>
+                                    <span class="text-xs font-medium text-slate-300">GitHub Host Target</span>
+                                    <span class="text-[10px] font-bold bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">ROCEL-HUBEL</span>
                                 </div>
                                 <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
                                     <span class="text-xs font-medium text-slate-300">Financial Ledger Data</span>
@@ -195,7 +195,7 @@
                             <thead class="bg-slate-900/80 text-slate-400 uppercase font-bold border-b border-slate-800">
                                 <tr>
                                     <th class="p-4">Company Name</th>
-                                    <th class="p-4">Dedicated Invite Link</th>
+                                    <th class="p-4">Dedicated GitHub Invite Link</th>
                                     <th class="p-4">Subscription Plan</th>
                                     <th class="p-4">Departments Pre-Created</th>
                                     <th class="p-4">Payment Status</th>
@@ -257,19 +257,19 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-400 mb-1">Email Subject Line</label>
-                                    <input type="text" id="email-subject" value="Welcome to AURA SaaS - Access Your Company Portal" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    <input type="text" id="email-subject" value="Welcome to ROCEL-HUBEL Platform - Access Your Company Portal" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-400 mb-1">Message Body Preview</label>
                                     <textarea id="email-body" rows="4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500">Hello,
 
-You have been granted access as a Company Leader / Department Head on the AURA SaaS Platform. 
+You have been granted access as a Company Leader / Department Head on ROCEL-HUBEL.
 
 Click the link below to verify your account, review pre-created departments, and begin appointing your internal team members:
-https://apex.aurasaas.io/activate?token=exp_99812423
+https://rocel-hubel.github.io/app/?tenant=apex-global
 
 Best regards,
-Super Admin Operations</textarea>
+ROCEL-HUBEL Operations</textarea>
                                 </div>
                                 <div class="flex items-center justify-between pt-2">
                                     <span class="text-[11px] text-slate-500 flex items-center gap-1">
@@ -294,7 +294,7 @@ Super Admin Operations</textarea>
                                 </div>
                             </div>
                             <div class="pt-4 border-t border-slate-800 text-[11px] text-slate-400">
-                                Automated welcome emails send unique single-use magic activation links directly to approved leaders.
+                                Automated welcome emails send unique activation links matching your GitHub host repository.
                             </div>
                         </div>
                     </div>
@@ -316,7 +316,7 @@ Super Admin Operations</textarea>
                             <div class="space-y-3 text-xs">
                                 <div>
                                     <label class="block text-slate-400 text-[11px] font-medium mb-1">Account Holder Name</label>
-                                    <input type="text" id="bank-holder" value="AURA Enterprise Systems LLC" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-medium">
+                                    <input type="text" id="bank-holder" value="ROCEL-HUBEL Platform LLC" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-medium">
                                 </div>
                                 <div>
                                     <label class="block text-slate-400 text-[11px] font-medium mb-1">Financial Institution</label>
@@ -492,7 +492,7 @@ Super Admin Operations</textarea>
                     <input type="text" id="modal-company-depts" value="Executive, Finance, Engineering, HR" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
                 <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 transition">
-                    Create Tenant & Generate Invite Link
+                    Create Tenant & Generate GitHub Invite Link
                 </button>
             </form>
         </div>
@@ -500,11 +500,11 @@ Super Admin Operations</textarea>
 
     <!-- SCRIPT APPLICATION LOGIC -->
     <script>
-        // --- DATA STATE ---
+        // --- DATA STATE (UPDATED TO ROCEL-HUBEL GITHUB FORMAT) ---
         let companies = [
-            { id: 1, name: "Apex Global Logistics", domain: "apex.aurasaas.io", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Finance", "Logistics", "HR"], status: "Settled", paidDate: "2026-09-01" },
-            { id: 2, name: "NovaTech Solutions", domain: "novatech.aurasaas.io", plan: "Pro Tier ($799/mo)", depts: ["Executive", "Engineering", "Sales"], status: "Settled", paidDate: "2026-09-03" },
-            { id: 3, name: "Vanguard Financials", domain: "vanguard.aurasaas.io", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Accounting", "Risk"], status: "Pending", paidDate: "-" }
+            { id: 1, name: "Apex Global Logistics", domain: "rocel-hubel.github.io/app/?tenant=apex-global", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Finance", "Logistics", "HR"], status: "Settled", paidDate: "2026-09-01" },
+            { id: 2, name: "NovaTech Solutions", domain: "rocel-hubel.github.io/app/?tenant=novatech", plan: "Pro Tier ($799/mo)", depts: ["Executive", "Engineering", "Sales"], status: "Settled", paidDate: "2026-09-03" },
+            { id: 3, name: "Vanguard Financials", domain: "rocel-hubel.github.io/app/?tenant=vanguard", plan: "Enterprise ($2,499/mo)", depts: ["Executive", "Accounting", "Risk"], status: "Pending", paidDate: "-" }
         ];
 
         let emailLogs = [
@@ -560,7 +560,7 @@ Super Admin Operations</textarea>
                             <span class="font-mono text-[11px] text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20">
                                 https://${c.domain}
                             </span>
-                            <button onclick="copyInviteLink('https://${c.domain}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="Copy Access Link">
+                            <button onclick="copyInviteLink('https://${c.domain}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="Copy GitHub Access Link">
                                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -724,7 +724,8 @@ Super Admin Operations</textarea>
             const name = document.getElementById('modal-company-name').value;
             const plan = document.getElementById('modal-company-plan').value;
             const depts = document.getElementById('modal-company-depts').value.split(',').map(s=>s.trim());
-            const domain = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.aurasaas.io';
+            const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const domain = `rocel-hubel.github.io/app/?tenant=${slug}`;
 
             companies.push({
                 id: Date.now(),
@@ -738,7 +739,7 @@ Super Admin Operations</textarea>
 
             renderCompanies();
             closeAddCompanyModal();
-            showToast(`Tenant "${name}" created! Dedicated link: https://${domain}`);
+            showToast(`Tenant "${name}" created! Link: https://${domain}`);
         }
 
         function showToast(msg) {
